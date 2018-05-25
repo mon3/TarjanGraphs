@@ -27,19 +27,17 @@ def generate_random_graph():
             size = len(list(nx.bridges(G))) # number of bridges
             file_name_adj = "random_{}_{}_{}.adj_list".format(nodes, prob, size)
             file_name_json = "random_{}_{}_{}.json".format(nodes, prob, size)
+            print(file_name_json)
 
-            file_path_adj = os.path.join(os.getcwd(),  'res', file_name_adj)
-            file_path_json = os.path.join(os.getcwd(),  'res', file_name_json)
+            file_path_adj = os.path.join(os.getcwd(), '..', 'res', file_name_adj)
+            file_path_json = os.path.join(os.getcwd(), '..', 'res', file_name_json)
 
             # writing to .json
             with open(file_path_json, "w") as f:
                 json.dump(res, f, indent=4)
 
             # writing to .adjlist
-            if os.path.exists(file_path_adj):
-                fh = open(file_path_adj, 'wb')
-            else:
-                fh = open(file_path_adj, 'wb+')
+            fh = open(file_path_adj, 'wb+')
             nx.write_adjlist(G, fh)
 
 
