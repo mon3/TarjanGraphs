@@ -1,27 +1,48 @@
-import os
-
-import matplotlib.pyplot as plt
+import json
 import networkx as nx
-import numpy as np
+import os
 import sys
-import timeit
 
 nodes = 100000
-probability = 0.00002
+probability = 0.000005
 
-for i in range(1):
-    G = nx.fast_gnp_random_graph(nodes, probability)
-    res = {}
-    try:
-        res = nx.to_dict_of_lists(G)
-    except TypeError:  # Python 3.x
-        sys.stdout("Error")
-        # nx.write_adjlist(res, sys.stdout.buffer)  # write adjacency list to screen
-    size = len(list(nx.bridges(G)))
-    file_name = "random_{}_02_{}.adj_list".format(nodes, size)
-    file_path = os.path.join(os.getcwd(), '..', 'res', file_name)
-    if os.path.exists(file_path):
-        fh = open(file_path, 'wb')
-    else:
-        fh = open(file_path, 'wb+')
-    nx.write_adjlist(G, fh)
+
+def generate_random_graph():
+    """
+    generates random graphs: external loop - number of repeated generations; inner loop-number of different probabilities
+
+    :return: saves generated graphs to json and as networkx adjlist
+    """
+    for i in range(1, 100):
+        for prob in range(1, 10):
+            prob = float(prob / float(nodes*10))  # den=nodes*10
+            G = nx.fast_gnp_random_graph(nodes, prob).to_undirected()
+            res = {}
+            try:
+                res = nx.to_dict_of_lists(G)
+
+            except TypeError:  # Python 3.x
+                sys.stdout("Error")
+
+            size = len(list(nx.bridges(G))) # number of bridges
+            file_name_adj = "random_{}_{}_{}.adj_list".format(nodes, prob, size)
+            file_name_json = "random_{}_{}_{}.json".format(nodes, prob, size)
+
+            file_path_adj = os.path.join(os.getcwd(),  'res', file_name_adj)
+            file_path_json = os.path.join(os.getcwd(),  'res', file_name_json)
+
+            # writing to .json
+            with open(file_path_json, "w") as f:
+                json.dump(res, f, indent=4)
+
+            # writing to .adjlist
+            if os.path.exists(file_path_adj):
+                fh = open(file_path_adj, 'wb')
+            else:
+                fh = open(file_path_adj, 'wb+')
+            nx.write_adjlist(G, fh)
+
+
+if __name__ == "__main__":
+    generate_random_graph()
+
